@@ -53,4 +53,5 @@ http://localhost:5000  # Or the specified backend/frontend port
 
 [View the PDF](./pdf/userguide.pdf)
 # LOOM video
-[Watch the Video]([[https://www.youtube.com/watch?v=your_video_id](https://youtu.be/gqQVfRz35Qw)])
+[Watch the Video](https://youtu.be/gqQVfRz35Qw?si=Iig8BBoLpH7WFvfV)
+
