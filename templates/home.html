@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Submission Dashboard</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Amatic+SC">
+    <style>
+        /* General styling */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            display: flex;
+            height: 100vh;
+            background-color: #f3f3f3;
+            color: #333;
+        }
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: #2a3b4f;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            border-right: 2px solid #1e2b3a;
+        }
+        .sidebar h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+        .sidebar a {
+            color: #aab7c4;
+            text-decoration: none;
+            font-size: 18px;
+            padding: 10px 0;
+            transition: color 0.2s;
+        }
+        .sidebar a:hover {
+            color: #29a3a3;
+        }
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            background-color: #e8e8e8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .form-section {
+            width: 80%;
+            max-width: 800px;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        /* Upload and Query Section Styles */
+        .file-upload-group,
+        .search-query-group {
+            background-color: #d9e0e7;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .file-upload-group label,
+        .search-query-group label {
+            font-weight: bold;
+            color: #2a3b4f;
+        }
+        .file-upload-group input[type="file"],
+        .file-upload-group input[type="url"],
+        .search-query-group input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #bbb;
+            border-radius: 5px;
+            background-color: #f0f4f8;
+            color: #333;
+        }
+
+        /* Submit Button */
+        .submit-button {
+            padding: 12px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            background-color: #ff8c42;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+        .submit-button:hover {
+            background-color: #e57a39;
+        }
+
+        /* Loading Screen Styling */
+        #loadingScreen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-family: "Amatic SC";
+            color: #d1abab;
+        }
+        #loadingScreen h1 {
+            font-size: 6vh;
+            opacity: 0.75;
+            animation: pulse 2.5s linear infinite;
+        }
+        /* Pulse animation */
+        @keyframes pulse {
+            0% { transform: scale(1, 1); opacity: 0.25; }
+            50% { transform: scale(1.2, 1); opacity: 1; }
+            100% { transform: scale(1, 1); opacity: 0.25; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <h1>Dashboard</h1>
+    <a href="{{url_for('index')  }}">Search Query</a>
+    <a href="{{url_for('about')  }}">About</a>
+    <a href="{{url_for('userguide')  }}">User Guide</a>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+    <h2>Data Submission Dashboard</h2>
+    <div class="form-section">
+
+        <!-- File Upload Section -->
+        <div class="file-upload-group">
+            <label>Upload CSV File:</label>
+            <input type="file" id="fileInput">
+            <label>Google Sheets URL:</label>
+            <input type="url" id="sheetUrlInput" placeholder="Enter Google Sheets URL">
+            <label>Upload Credentials JSON:</label>
+            <input type="file" id="credentialsFileInput" name="credentials_file" accept="application/json">
+        </div>
+
+        <!-- Search Query Section -->
+        <div class="search-query-group">
+            <label>Search Query:</label>
+            <input type="text" id="queryInput" placeholder="Enter your query here">
+        </div>
+
+        <!-- Submit Button -->
+        <button class="submit-button" onclick="submitData()">Submit Data</button>
+
+        <!-- Result Display -->
+        <div id="result"></div>
+    </div>
+</div>
+
+<!-- Loading Screen -->
+<div id="loadingScreen">
+    <h1>Fetching in progress...</h1>
+</div>
+
+<script>
+    async function submitData() {
+        // Show loading screen
+        document.getElementById('loadingScreen').style.display = 'flex';
+
+        const query = document.getElementById('queryInput').value;
+        const fileInput = document.getElementById('fileInput');
+        const sheetUrl = document.getElementById('sheetUrlInput').value;
+        const credentialsFileInput = document.getElementById('credentialsFileInput'); 
+
+        const formData = new FormData();
+        formData.append('query', query);
+
+        if (fileInput.files.length > 0) {
+            formData.append('file', fileInput.files[0]);
+        }
+
+        if (sheetUrl) {
+            formData.append('sheet_url', sheetUrl);
+        }
+
+        if (credentialsFileInput.files.length > 0) {
+            formData.append('credentials_file', credentialsFileInput.files[0]);
+        }
+
+        try {
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            console.log("Server response:", data);
+
+            if (data.status === 'success') {
+                window.location.href = data.redirect_url;
+            } else {
+                alert(data.message || 'An error occurred');
+            }
+        } catch (error) {
+            console.error("Error during upload:", error);
+            alert("An error occurred during upload. Check console for details.");
+        } finally {
+            // Hide the loading screen after completion
+            document.getElementById('loadingScreen').style.display = 'none';
+        }
+    }
+</script>
+
+</body>
+</html>

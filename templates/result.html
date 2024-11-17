@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataFrame Display with Search</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: #2c3e50; /* Dark background */
+            color: #ecf0f1; /* Light text color */
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 20px;
+        }
+        h1 {
+            color: #ecf0f1; /* Light text color */
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #searchInput {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            background-color: #34495e; /* Darker input background */
+            color: #ecf0f1; /* Light text color */
+            border: 1px solid #34495e;
+        }
+        #searchInput::placeholder {
+            color: #bdc3c7; /* Light placeholder color */
+        }
+        #tableContainer {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #34495e;
+            text-align: left;
+        }
+        th {
+            background-color: #34495e; /* Darker header background */
+            color: #ecf0f1;
+        }
+        tr:nth-child(even) {
+            background-color: #3b4a5a; /* Alternating row color */
+        }
+        tr:hover {
+            background-color: #4a5a6a; /* Hover color */
+        }
+        #downloadButton {
+            font-size: 0.9em;
+            width: fit-content;
+            align-self: center;
+            margin-top: 20px;
+            background-color: #2980b9;
+            border: none;
+            color: #ecf0f1;
+        }
+        #downloadButton:hover {
+            background-color: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Data Frame</h1>
+
+        <!-- Search input -->
+        <input type="text" id="searchInput" class="form-control" placeholder="Search for content..." onkeyup="searchTable()">
+
+        <!-- Display the DataFrame table -->
+        <div id="tableContainer">
+            {{ table_html|safe }}
+        </div>
+
+        <!-- Download CSV Button at the bottom -->
+        <button id="downloadButton" class="btn btn-sm" onclick="downloadCSV()">Download CSV</button>
+    </div>
+
+    <!-- JavaScript for search functionality -->
+    <script>
+        function searchTable() {
+            let input = document.getElementById('searchInput').value.toLowerCase();
+            let table = document.querySelector('#tableContainer table');
+            let rows = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < rows.length; i++) {  // Skip header row
+                let cells = rows[i].getElementsByTagName('td');
+                let rowContainsText = false;
+
+                for (let j = 0; j < cells.length; j++) {
+                    if (cells[j].textContent.toLowerCase().includes(input)) {
+                        rowContainsText = true;
+                        break;
+                    }
+                }
+
+                rows[i].style.display = rowContainsText ? '' : 'none';
+            }
+        }
+
+        function downloadCSV() {
+            let table = document.querySelector('#tableContainer table');
+            let rows = Array.from(table.rows);
+            let csvContent = rows.map(row => {
+                let cells = Array.from(row.cells);
+                return cells.map(cell => cell.textContent).join(',');
+            }).join('\n');
+
+            let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            let link = document.createElement('a');
+            let url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'data_frame.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
