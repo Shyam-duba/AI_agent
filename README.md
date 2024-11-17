@@ -1,6 +1,6 @@
 # **AI Agent for Data Extraction and Web Search**<br>
 **Introduction**<br>
-Welcome to the AI Agent Project! This application is designed to evaluate your skills in machine learning, API integration, and prompt engineering. The AI agent processes a dataset (CSV or Google Sheets), performs web searches to retrieve specific information for each entity in a chosen column, and formats the extracted data into a structured output.<br>
+Welcome to the AI Agent Project! This application is designed to make user life easier for fetching many queries and compute result for specific use. The AI agent processes a dataset (CSV or Google Sheets), performs web searches to retrieve specific information for each entity in a chosen column, and formats the extracted data into a structured output.<br>
 
  **Key Features:**<br>
     1.Leverages a Large Language Model (LLM) for parsing web search results based on user queries.<br>
