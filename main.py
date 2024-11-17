@@ -6,7 +6,7 @@ from google.oauth2.service_account import Credentials
 import re
 import numpy as np
 import os
-import fitz
+# import fitz
 
 
 app = Flask(__name__,static_folder='static')
